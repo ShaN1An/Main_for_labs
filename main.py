@@ -1,12 +1,70 @@
+import random
+import notes_data
+
+random.seed(24762876)
+
+def help():
+    return notes_data.HELP_TEXT
+
+def add_note(notes, text, sep=";"):
+    if text == "":
+        print("Ошибка: текст заметки не указан.")
+        return notes
+
+    if notes == "":
+        notes = text
+    else:
+        notes = notes + sep + text
+
+    print("Заметка добавлена.")
+
+    return notes
+
+def list_notes(notes):
+    if notes == "":
+        print("Заметок пока нет.")
+    else:
+        print("Ваши заметки:")
+
+        current_note = ""
+
+        for symbol in notes:
+            if symbol == notes_data.DEFAULT_SEPARATOR:
+                print(current_note)
+                current_note = ""
+            else:
+                current_note = current_note + symbol
+
+        if current_note != "":
+            print(current_note)
+
+def find_note(notes, word):
+    if word == "":
+        print("Ошибка: укажите слово для поиска.")
+        return
+
+    if word.exitlower() in notes.lower():
+        print("Найдено.")
+    else:
+        print("Не найдено.")
+
+def random_tip():
+    number = random.randint(1, 8)
+
+    if number == 1:
+        print(notes_data.TIP_1)
+    elif number == 2:
+        print(notes_data.TIP_2)
+    elif number == 3:
+        print(notes_data.TIP_3)
+    else:
+        print(notes_data.TIP_4)
+
 notes = ""
 
-print("Менеджер заметок")
-print("Доступные команды:")
-print("add <текст> - добавить заметку")
-print("list - показать заметки")
-print("find <слово> - найти слово")
-print("clear - удалить все заметки")
-print("exit - выйти")
+print(notes_data.APP_NAME)
+print(help())
+
 while True:
     command = input("> ")
 
@@ -14,40 +72,26 @@ while True:
         print("Программа завершена.")
         break
 
+    elif command == "help":
+        print(help())
+
     elif command == "list":
-        if notes == "":
-            print("Заметок пока нет.")
-        else:
-            print("Ваши заметки:")
-            print(notes)
+        list_notes(notes)
 
     elif command == "clear":
         notes = ""
         print("Все заметки удалены.")
 
+    elif command == "tip":
+        random_tip()
+
     elif command[:4] == "add ":
         text = command[4:]
-
-        if text == "":
-            print("Ошибка: текст заметки не указан.")
-        else:
-            if notes == "":
-                notes = text
-            else:
-                notes = notes + "\n" + text
-
-            print("Заметка добавлена.")
+        notes = add_note(notes, text)
 
     elif command[:5] == "find ":
         word = command[5:]
-
-        if word == "":
-            print("Ошибка: укажите слово для поиска.")
-        else:
-            if word in notes:
-                print("Найдено.")
-            else:
-                print("Не найдено.")
+        find_note(notes, word)
 
     elif command == "":
         print("Ошибка: введите команду.")
