@@ -1,55 +1,78 @@
 import random
+
 import notes_data
 
+
 random.seed(24762876)
+
+# Все заметки хранятся в списке, а теги — в словаре по индексу заметки.
+notes = []
+tags = {}
+all_tags = set()
+
 
 def help():
     return notes_data.HELP_TEXT
 
-def add_note(notes, text, sep=";"):
+
+def add_note(notes, text):
+    """Добавляет текст заметки в список заметок."""
     if text == "":
         print("Ошибка: текст заметки не указан.")
         return notes
 
-    if notes == "":
-        notes = text
-    else:
-        notes = notes + sep + text
-
+    notes.append(text)
     print("Заметка добавлена.")
-
     return notes
 
+
 def list_notes(notes):
-    if notes == "":
+    if not notes:
         print("Заметок пока нет.")
-    else:
-        print("Ваши заметки:")
-
-        current_note = ""
-
-        for symbol in notes:
-            if symbol == notes_data.DEFAULT_SEPARATOR:
-                print(current_note)
-                current_note = ""
-            else:
-                current_note = current_note + symbol
-
-        if current_note != "":
-            print(current_note)
-
-def find_note(notes, word):
-    if word == "":
-        print("Ошибка: укажите слово для поиска.")
         return
 
-    if word.exitlower() in notes.lower():
+    print("Ваши заметки:")
+    for note in notes:
+        print(note)
+
+
+def find_note(notes, word):
+    """Возвращает заметки, в которых встречается указанное слово."""
+    if word == "":
+        print("Ошибка: укажите слово для поиска.")
+        return []
+
+    found_or_empty = [
+        note if word.lower() in note.lower() else ""
+        for note in notes
+    ]
+    found_notes = [note for note in found_or_empty if note]
+    if found_notes:
         print("Найдено.")
     else:
         print("Не найдено.")
+    return found_notes
+
+
+def add_tag(tags, idx, tag):
+    """Добавляет тег к заметке по её индексу."""
+    if idx not in tags:
+        tags[idx] = set()
+    tags[idx].add(tag)
+    all_tags.add(tag)
+    return tags
+
+
+def get_long_notes(notes):
+    return [n for n in notes if len(n) > 12]
+
+
+def get_upper_notes(notes):
+    return [n.upper() for n in notes]
+
 
 def random_tip():
-    number = random.randint(1, 8)
+    number = random.randint(1, 4)
 
     if number == 1:
         print(notes_data.TIP_1)
@@ -60,41 +83,39 @@ def random_tip():
     else:
         print(notes_data.TIP_4)
 
-notes = ""
 
-print(notes_data.APP_NAME)
-print(help())
+def run():
+    global notes, tags, all_tags
 
-while True:
-    command = input("> ")
+    print(notes_data.APP_NAME)
+    print(help())
 
-    if command == "exit":
-        print("Программа завершена.")
-        break
+    while True:
+        command = input("> ")
 
-    elif command == "help":
-        print(help())
+        if command == "exit":
+            print("Программа завершена.")
+            break
+        elif command == "help":
+            print(help())
+        elif command == "list":
+            list_notes(notes)
+        elif command == "clear":
+            notes = []
+            tags = {}
+            all_tags = set()
+            print("Все заметки удалены.")
+        elif command == "tip":
+            random_tip()
+        elif command[:4] == "add ":
+            add_note(notes, command[4:])
+        elif command[:5] == "find ":
+            find_note(notes, command[5:])
+        elif command == "":
+            print("Ошибка: введите команду.")
+        else:
+            print("Неизвестная команда.")
 
-    elif command == "list":
-        list_notes(notes)
 
-    elif command == "clear":
-        notes = ""
-        print("Все заметки удалены.")
-
-    elif command == "tip":
-        random_tip()
-
-    elif command[:4] == "add ":
-        text = command[4:]
-        notes = add_note(notes, text)
-
-    elif command[:5] == "find ":
-        word = command[5:]
-        find_note(notes, word)
-
-    elif command == "":
-        print("Ошибка: введите команду.")
-
-    else:
-        print("Неизвестная команда.")
+if __name__ == "__main__":
+    run()
